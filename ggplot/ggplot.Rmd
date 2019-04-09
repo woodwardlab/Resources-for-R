@@ -1,0 +1,187 @@
+---
+title: "ggplot - by no means an exhaustive guide "
+author: "Nicole"
+date: "4/9/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Set-up
+
+Load library - you can either load ggplot specifically or load 'tidyverse'
+
+```{r load library}
+library(ggplot2)
+library(tidyverse)
+```
+
+***
+
+Import data: I have included dummy data on the github repo for an example. 
+
+```{r import data}
+dummydata <- read.csv("ggplot dummy data.csv")
+# View data 
+str(dummydata)
+# How many subjects?
+length(unique(dummydata$Subject))
+```    
+
+***
+
+## Using ggplot! 
+
+Here is the code for basic ggplot. ggplot follows the 'grammar of graphics'. Google that phrase if you want to know more about it - it takes about how ggplots are set up. 
+
+You start with a base: 
+
+```{r base ggplot}
+plot <- ggplot(data = dummydata, aes(x = NetworkSize, y = PT.Score)) +
+  geom_point()
+plot
+
+# You could also write it like this and it returns the same thing
+plot <- ggplot(dummydata, aes(NetworkSize, PT.Score)) +
+  geom_point()
+plot
+```
+
+***
+### Coloring points by a third variable
+
+Then you can color those points by a third variable. For example, what if we want to color those points by TrialType?
+
+```{r color by third variable}
+plot_color <- ggplot(data = dummydata, aes(x = NetworkSize, y = PT.Score,
+                                           colour = TrialType)) +
+  geom_point()
+plot_color
+```
+
+
+How to change those **colors**. The colors it defaults too suck. You can change the colors by adding this line of code. You can also change what you call the 3rd variable by using "labels". 
+
+```{r manually change colors}
+plot_color2 <- ggplot(data = dummydata, aes(x = NetworkSize, y = PT.Score,
+                                           colour = TrialType)) +
+  geom_point() + scale_colour_manual(values = c("red", "blue"), labels = c("Can See Trials", "Does Not See Trials"))
+plot_color2
+```
+
+
+**If/when scale_colour_manual doesn't work**. Try scale_colour_discrete or scale_colour_fill. scale_colour_manual works for categorical variables. Those other functions works for continious variables. 
+
+***
+### Change axis, axis titles, and size 
+
+How to change the axis titles and sizes! I will do that all at once here, but the code is pretty self-explanatory: 
+
+```{r change titles and size}
+plot_titlesandsize <- ggplot(dummydata, aes(NetworkSize, PT.Score, colour = TrialType)) +
+  geom_point() + ggtitle("PT Score x Network Size") + ylab("PT Score") + xlab("Network Size") +
+  theme(text = element_text(size = 16)) + ylim(0,1) + 
+  scale_colour_manual(values = c("red", "blue"), labels = c("Can See Trials", "Does Not See Trials"))
+plot_titlesandsize
+```
+
+You can change the x-axis by adding 'xlim()'
+
+***
+
+### Add regression lines or other lines 
+
+To add a regression line, you should use geom_smooth. Depending on what line you want will change where you put the code: 'colour = TrialType'. 
+
+If you want separate regression lines for each of your values (i.e., separate lines for CanSee and CannotSee), then you do the following:
+
+```{r geom_smooth for each values of colour}
+plot_lines <- ggplot(dummydata, aes(NetworkSize, PT.Score, colour = TrialType)) +
+  geom_point() + ggtitle("PT Score x Network Size") + ylab("PT Score") + xlab("Network Size") +
+  theme(text = element_text(size = 16)) + ylim(0,1) + 
+  scale_colour_manual(values = c("red", "blue"), labels = c("Can See Trials", "Does Not See Trials")) +
+  geom_smooth(method = "lm")
+plot_lines
+
+# indicating se = FALSE in geom_smooth will get rid of se bars
+plot_lines <- ggplot(dummydata, aes(NetworkSize, PT.Score, colour = TrialType)) +
+  geom_point() + ggtitle("PT Score x Network Size") + ylab("PT Score") + xlab("Network Size") +
+  theme(text = element_text(size = 16)) + ylim(0,1) + 
+  scale_colour_manual(values = c("red", "blue"), labels = c("Can See Trials", "Does Not See Trials")) +
+  geom_smooth(method = "lm", se = FALSE)
+plot_lines
+```
+
+
+If you just want the **main effect** (i.e., the regression line for the effect of Networks Size on PT score), then the code should look like this. You need to move 'colour = TrialType' into geom_point. This has to do with the 'grammar of graphics' and how ggplot is understanding your data. 
+
+```{r geom_smooth main effect}
+plot_lines <- ggplot(dummydata, aes(NetworkSize, PT.Score)) +
+  geom_point(aes(colour = TrialType)) + ggtitle("PT Score x Network Size") + ylab("PT Score") + xlab("Network Size") +
+  theme(text = element_text(size = 16)) + ylim(0,1) + 
+  scale_colour_manual(values = c("red", "blue"), labels = c("Can See Trials", "Does Not See Trials")) +
+  geom_smooth(method = "lm", col = "black")
+plot_lines
+
+```
+
+***
+
+Adding a line to indicate change performance. 
+geom_hline(yintercept=20, linetype="dashed", 
+                color = "red", size=2)
+                
+```{r add horizontal line}
+plot_lines2 <- ggplot(dummydata, aes(NetworkSize, PT.Score)) +
+  geom_point(aes(colour = TrialType)) + ggtitle("PT Score x Network Size") + ylab("PT Score") + xlab("Network Size") +
+  theme(text = element_text(size = 16)) + ylim(0,1) + 
+  scale_colour_manual(values = c("red", "blue"), labels = c("Can See Trials", "Does Not See Trials")) +
+  geom_smooth(method = "lm", col = "black") + geom_hline(yintercept = .5, linetype = "dashed",
+                                                         color = "light grey")
+plot_lines2
+```
+
+### A plot with lots of things that you can explore. 
+
+I am including a final plot of other things I have done to ggplot. Feel free to work through this code to see how you can change the end result. 
+
+If you want to change the font of ggplots, you have to run the following code: 
+
+```{r font}
+library(extrafont)
+font_import()
+```
+
+A beautiful, finished product! 
+
+```{r last plot, warning=FALSE}
+ggplot(dummydata, aes(NetworkSize, PT.Score)) +
+  # this line changes properties of the points
+  geom_point(size = 2.5, aes(colour = TrialType)) +
+  # this line adds titles 
+  ylab("PT Score") + xlab("Network Size") + ggtitle("PT Score x Network Size") +
+  # this line changes the axis and "jitters" pts - it spreads them out
+  ylim(0,1) + xlim(0,20) + geom_jitter(size = 2.5, aes(colour = TrialType)) +
+  # this line changes the color
+  scale_colour_manual(values = c("blue", "red"), labels = c("Can See", "Does Not See")) +
+  # this line adds a horizontal line
+  geom_hline(yintercept = .50, linetype = "dashed", col = "black") + 
+  # this line changes the font and font size 
+  theme(text = element_text(size = 16, family = "Georgia")) +
+  # this gets rid of the grey background
+  theme(panel.background = element_blank()) +
+  # this adds back axis lines 
+  theme(axis.line = element_line(colour = "black")) +
+  # this moves the legend to the bottom
+  theme(legend.position = "bottom") +
+  # this makes the numbers on the axis bigger 
+  theme(axis.text.x = element_text(size = 14)) +
+  theme(axis.text.y = element_text(size = 14)) +
+  # this adds the regression line
+  geom_smooth(method = "lm", col = "black")
+
+
+```
+
