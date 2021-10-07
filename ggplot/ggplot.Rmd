@@ -183,7 +183,7 @@ ggplot(dummydata, aes(NetworkSize, PT.Score)) +
   geom_smooth(method = "lm", col = "black")
 ```
 
-### Code to reverse order of "~facet_wrap()
+### Code to reverse order of "~facet_wrap()" 
 
 ```{r facet_wrap()}
 ### trying to reverse order of facet wrap
@@ -194,10 +194,20 @@ ggplot(dummydata, aes(NetworkSize, PT.Score)) +
 #                                     Put the levels in the order you want them to appear in the graph
 mydata$variable <- factor(mydata$variable,
                                        levels = c("level1", "level2", "levelx"))
-
-
 ```
 
+### Code to change order of ggplot legend
+
+```{r change order of ggplot legend}
+### This is the same code you would use to change order for '~facet_wrap()' 
+# 'mydata' == your dataframe
+# 'variable' == the variable you want to reorder 
+# 'level1', 'level2', and 'levelx' == these are the levels that you have in your variable. 
+#                                     To get these levels, run the command 'unique(mydata$variable)
+#                                     Put the levels in the order you want them to appear in the graph
+mydata$variable <- factor(mydata$variable,
+                                       levels = c("level1", "level2", "levelx"))
+```
 
 
 
