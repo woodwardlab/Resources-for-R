@@ -181,7 +181,23 @@ ggplot(dummydata, aes(NetworkSize, PT.Score)) +
   theme(axis.text.y = element_text(size = 14)) +
   # this adds the regression line
   geom_smooth(method = "lm", col = "black")
+```
+
+### Code to reverse order of "~facet_wrap()
+
+```{r facet_wrap()}
+### trying to reverse order of facet wrap
+# 'mydata' == your dataframe
+# 'variable' == the variable you want to reorder 
+# 'level1', 'level2', and 'levelx' == these are the levels that you have in your variable. 
+#                                     To get these levels, run the command 'unique(mydata$variable)
+#                                     Put the levels in the order you want them to appear in the graph
+mydata$variable <- factor(mydata$variable,
+                                       levels = c("level1", "level2", "levelx"))
 
 
 ```
+
+
+
 
